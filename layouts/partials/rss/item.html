@@ -12,9 +12,15 @@
     <author>
         {{- .params.author | default (T "author") -}}
     </author>
+    {{ if $params.id }}
+    <guid isPermalink='false'>
+    	{{- $params.id -}}
+    </guid>
+    {{ else }}
     <guid>
         {{- .Page.Permalink -}}
     </guid>
+    {{ end }}
     <description>
         {{- "<![CDATA[" | safeHTML -}}
         {{- with $params.featuredimage -}}
