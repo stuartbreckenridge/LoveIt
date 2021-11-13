@@ -1,46 +1,38 @@
-{{- if .Site.Params.search -}}
-    {{- $index := slice -}}
-    {{- $pages := .Site.RegularPages -}}
-    {{- if .Site.Params.page.hiddenFromSearch -}}
-        {{- $pages = where $pages "Params.hiddenfromsearch" false -}}
-    {{- else -}}
-        {{- $pages = where $pages "Params.hiddenfromsearch" "!=" true -}}
-    {{- end -}}
-    {{- range $pages -}}
-        {{- $uri := .RelPermalink -}}
-        {{- if $.Site.Params.search.absoluteURL -}}
-            {{- $uri = .Permalink -}}
-        {{- end -}}
-        {{- $meta := dict "uri" $uri "title" .Title "tags" .Params.tags "categories" .Params.categories -}}
-        {{- $meta = $.Site.Params.dateFormat | default "2006-01-02" | .PublishDate.Format | dict "date" | merge $meta -}}
-        {{- with .Description -}}
-            {{- $index = $index | append (dict "content" . "objectID" $uri | merge $meta) -}}
-        {{- end -}}
-        {{- $params := .Params | merge $.Site.Params.page -}}
-        {{/* Extended Markdown syntax */}}
-        {{- $content := dict "Content" .Content "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" -}}
-        {{/* Remove line number for code */}}
-        {{- $content = $content | replaceRE `<span class="lnt?"> *\d*\n?</span>` "" -}}
-        {{- range $i, $contenti := split $content "<h2 id=" -}}
-            {{- if gt $i 0 -}}
-                {{- $contenti = printf "<h2 id=%v" $contenti -}}
-            {{- end -}}
-            {{- range $j, $contentj := split $contenti "<h3 id=" -}}
-                {{- if gt $j 0 -}}
-                    {{- $contentj = printf "<h3 id=%v" $contentj -}}
-                {{- end -}}
-                {{/* Plainify, unescape and remove (\n, \t) */}}
-                {{- $contentj = $contentj | plainify | htmlUnescape | replaceRE `[\n\t ]+` " " -}}
-                {{- if gt $.Site.Params.search.contentLength 0 -}}
-                    {{- $contentj = substr $contentj 0 $.Site.Params.search.contentLength -}}
-                {{- end -}}
-                {{- if $contentj | and (ne $contentj " ") -}}
-                    {{- $one := printf "%v:%v:%v" $uri $i $j | dict "content" $contentj "objectID" | merge $meta -}}
-                    {{- $index = $index | append $one -}}
-                {{- end -}}
-            {{- end -}}
-        {{- end -}}
-    {{- end -}}
-
-    {{- $index | jsonify | safeJS -}}
-{{- end -}}
+{
+		"version": "https://jsonfeed.org/version/1",
+		"title": {{ .Site.Title | jsonify  }},
+		"home_page_url": {{ .Permalink | jsonify }},
+		{{ with  .OutputFormats.Get "json" -}}
+		"feed_url": {{ .Permalink | jsonify  }},
+		{{- end }}
+		"icon": "https://mynameisstuart.com/logo.png",
+		"favicon": "https://mynameisstuart.com/favicon.ico",
+		"author": {
+			"name": "Stuart Breckenridge"
+		},
+		{{ if .Site.RegularPages }}
+		"items": [
+			{{ range $index, $element := first 10 .Site.RegularPages -}}
+			{{ if eq $element.Section "posts" -}}
+				{{ if $index }},{{end}} {
+					"title": {{ $element.Title | jsonify }},{{ if isset $element.Params "id" }}
+					"id":  {{ $element.Params.id | jsonify }},{{ else }}"id":  {{ $uuid := sha1 (.Permalink  | absURL)}}"{{substr $uuid 0 8}}-{{substr $uuid 8 4}}-5{{substr $uuid 13 3}}-{{substr $uuid 16 1}}9{{substr $uuid 17 2}}-{{substr $uuid 21 12}}",{{ end }}
+					"url": {{ $element.Permalink | jsonify }},
+					"banner_image": {{ $element.Params.featuredImage | absURL | jsonify }},
+					"summary": {{ $element.Summary | jsonify }},{{ if isset $element.Params "link" }}
+					"external_url": {{ $element.Params.link | jsonify }},{{ end }}{{ if isset $element.Params "cover"}}
+					"image": {{ $element.Params.cover.image | jsonify }},{{ end }}
+					"content_html": {{ $element.Content | jsonify }},
+					"content_text": {{ $element.Plain | jsonify }},
+					"author" : {
+						"name" : "Stuart Breckenridge"
+					},{{ if isset $element.Params "updated" }}
+					"date_modified": {{ $element.Params.updated | jsonify }},{{ end }} 
+					"date_published": {{ $element.Date | jsonify }}
+				}
+				{{ end }}
+			{{ end }}
+		]
+		{{ end }}
+	}
+	
