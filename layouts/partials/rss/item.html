@@ -3,17 +3,13 @@
     <title>
         {{- .Page.Title -}}
     </title>
-    <link rel="related">
-        {{- .Page.Permalink -}}
-    </link>
+    <link rel="related" type="text/html">{{- .Page.Permalink -}}</link>
     <pubDate>
         {{- .Page.Date.Format "Mon, 02 Jan 2006 15:04:05 -0700"  -}}
     </pubDate>
-    <author>
-        <name>Stuart Breckenridge</name>
-    </author>
+    <author>Stuart Breckenridge</author>
     {{ if $params.id }}
-    <guid isPermalink='false'>
+    <guid isPermalink="false">
     	{{- $params.id -}}
     </guid>
     {{ else }}
@@ -22,9 +18,7 @@
     </guid>
     {{ end }}
     {{ if $params.link }}
-    <link rel="alternate">
-        {{- $params.link -}}
-    </link>
+    <link rel="alternate" type="text/html">{{- $params.link -}}</link>
     {{- end -}}
     <description>
         {{- "<![CDATA[" | safeHTML -}}
