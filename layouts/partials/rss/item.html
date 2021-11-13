@@ -9,13 +9,18 @@
     		<pubDate>
         		{{- .Page.Date.Format "Mon, 02 Jan 2006 15:04:05 -0700"  -}}
     		</pubDate>
-    		<author>Stuart Breckenridge</author>
+    		<author>desk@mynameisstuart.com (Stuart Breckenridge)</author>
     		{{- if $params.id }}
     		<guid isPermaLink="false">{{- $params.id -}}</guid>
     		{{ else }}
     		<guid>{{- .Page.Permalink -}}</guid>
     		{{- end -}}
-    		<description>
+			{{- if $params.summary -}}
+			<description>{{ $params.summary | html }}</description>
+			{{ else }}
+			<description>{{ .Page.Title | html }}</description>
+			{{- end -}}
+    		<content:encoded>
         		{{- "<![CDATA[" | safeHTML -}}
         		{{- with $params.featuredimage -}}
             		<div class="featured-image">
@@ -32,5 +37,5 @@
         		{{- end -}}
         		{{- $content | replaceRE `<figure[^>]*>.*</figure>` "" | replaceRE `<img[^>]*( /)?>` "" | safeHTML -}}
         		{{- "]]>" | safeHTML -}}
-    		</description>
+    		</content:encoded>
 		</item>
