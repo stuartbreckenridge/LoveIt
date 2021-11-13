@@ -18,6 +18,7 @@
 					"title": {{ $element.Title | jsonify }},{{ if isset $element.Params "id" }}
 					"id":  {{ $element.Params.id | jsonify }},{{ else }}"id":  {{ $uuid := sha1 (.Permalink  | absURL)}}"{{substr $uuid 0 8}}-{{substr $uuid 8 4}}-5{{substr $uuid 13 3}}-{{substr $uuid 16 1}}9{{substr $uuid 17 2}}-{{substr $uuid 21 12}}",{{ end }}
 					"url": {{ $element.Permalink | jsonify }},
+					"image": {{ $element.Params.featuredImage | absURL | jsonify }},
 					"banner_image": {{ $element.Params.featuredImage | absURL | jsonify }},
 					"summary": {{ $element.Summary | jsonify }},{{ if isset $element.Params "link" }}
 					"external_url": {{ $element.Params.link | jsonify }},{{ end }}{{ if isset $element.Params "cover"}}
